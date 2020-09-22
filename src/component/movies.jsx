@@ -39,22 +39,13 @@ export default class movies extends Component {
         console.log(genre)
          this.setState({selectedGenre:genre,currentPage:1})    
     }
-    handelSort=(path)=>{
-        const sortColumn={...this.state.sortColumn}
-        if(sortColumn.path===path)
-        sortColumn.order=sortColumn.order==='asc'?'desc':'asc';
-        else{
-            sortColumn.path=path;
-            sortColumn.order='asc'
-        }
-        this.setState({sortColumn})
+    handelSort=(sortColumn)=>{
+        
+        this.setState({sortColumn })
 
     }
-    render() {
-        const {length:count}=this.state.movies;
+    getPageData=()=>{
         const {movies:allMovies,pageSize,currentPage,selectedGenre,sortColumn}=this.state
-
-        if (count ===0) return <p>There are no movies in the database</p>
         const filtered=selectedGenre && selectedGenre._id
         ? allMovies.filter(m => m.genre._id === selectedGenre._id )
         : allMovies;
@@ -62,7 +53,14 @@ export default class movies extends Component {
        const sorted= _.orderBy(filtered,[sortColumn.path],[sortColumn.order]);
 
         const movies=Paginate(sorted,currentPage,pageSize)
+        return {totalCount:filtered.length,data:movies}
+    }
+    render() {
+        const {length:count}=this.state.movies;
+        const {pageSize,currentPage,sortColumn}=this.state
 
+        if (count ===0) return <p>There are no movies in the database</p>
+            const {totalCount,data}=this.getPageData()
         return (
             <div className='row m-4'>
                 <div className="col-3 m-2">
@@ -73,14 +71,15 @@ export default class movies extends Component {
                 />
                 </div>
                 <div className="col">
-                <p>Showing {filtered.length} movies in the database.</p>
+                <p>Showing {totalCount} movies in the database.</p>
                 <MoviesTable 
-                movies={movies}
+                movies={data}
+                sortColumn={sortColumn}
                 onDelete={this.handelDelete}
                 onLike={this.handelLiked}
                 onSort={this.handelSort}
                 />
-                <Pagination itemCount={filtered.length} pageSize={pageSize} onPageChange={this.handelpageChange} currentPage={currentPage} /></div>
+                <Pagination itemCount={totalCount} pageSize={pageSize} onPageChange={this.handelpageChange} currentPage={currentPage} /></div>
                 </div>
         )}
 }
