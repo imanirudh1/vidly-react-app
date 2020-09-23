@@ -5,16 +5,29 @@ class LoginForm extends Component {
         account:{
             username: '',
             password: ''
-        }
+        },
+        error:{}
     };
+    validate = () => {
+        const error = {}
+        const { account } = this.state
+        if (account.username.trim() === '')
+            error.username = 'Username is Required'
+         if (account.password.trim() === "")
+            error.password = "Password is Required";
+        return Object.keys(error).length===0 ? null : error
+    }
      formHandeler = (e) => {
          e.preventDefault();
-         
-         console.log('clicked')
+         const error = this.validate();
+         this.setState({error})
+         console.log(error)
+         if (error) return
+         console.log('submitted')
      }
     inputHandeller = (e) => {
         const account = { ...this.state.account }
-        account[e.currentTarget.id] = e.currentTarget.value;
+        account[e.currentTarget.name] = e.currentTarget.value;
         this.setState({account})
      }
      render() { 
