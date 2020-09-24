@@ -6,6 +6,7 @@ import ListGroup from './common/listGroup';
 import Pagination from './common/pagination';
 import {Paginate} from './util/paginate'
 import MoviesTable from './common/moviesTable';
+import { Link } from 'react-router-dom';
 export default class movies extends Component {
     state={
         movies:[],
@@ -62,24 +63,31 @@ export default class movies extends Component {
         if (count ===0) return <p>There are no movies in the database</p>
             const {totalCount,data}=this.getPageData()
         return (
-            <div className='row m-4'>
-                <div className="col-3 m-2">
-                <ListGroup 
+          <div className="row m-4">
+            <div className="col-3 m-2">
+              <ListGroup
                 items={this.state.genres}
-                 onItemSelect={this.handelGenres}
-                selecteditem={this.state.selectedGenre} 
-                />
-                </div>
-                <div className="col">
-                <p>Showing {totalCount} movies in the database.</p>
-                <MoviesTable 
+                onItemSelect={this.handelGenres}
+                selecteditem={this.state.selectedGenre}
+              />
+            </div>
+            <div className="col">
+              <Link to='movies/new' style={{marginBottom:20}} className="btn btn-primary">New Movie</Link>
+              <p>Showing {totalCount} movies in the database.</p>
+              <MoviesTable
                 movies={data}
                 sortColumn={sortColumn}
                 onDelete={this.handelDelete}
                 onLike={this.handelLiked}
                 onSort={this.handelSort}
-                />
-                <Pagination itemCount={totalCount} pageSize={pageSize} onPageChange={this.handelpageChange} currentPage={currentPage} /></div>
-                </div>
-        )}
+              />
+              <Pagination
+                itemCount={totalCount}
+                pageSize={pageSize}
+                onPageChange={this.handelpageChange}
+                currentPage={currentPage}
+              />
+            </div>
+          </div>
+        );}
 }
