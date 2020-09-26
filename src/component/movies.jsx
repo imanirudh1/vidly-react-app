@@ -56,7 +56,7 @@ export default class movies extends Component {
       if (searchQueryValue)
         filtered = allMovies.filter(m => m.title.toLowerCase().startsWith(searchQueryValue.toLowerCase()));
       else if (selectedGenre && selectedGenre._id)
-        filtered = allMovies.filter(m => m.genre._id === selectedGenre._id);
+        filtered = allMovies.filter(m => m.genre._id === selectedGenre._id); 
        
 
        const sorted= _.orderBy(filtered,[sortColumn.path],[sortColumn.order]);
