@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import {getMovies} from '../services/fakeMovieService'
-import {getGenres} from '../services/fakeGenreService'
-import _, { filter } from 'lodash'
+import {getMovies,deleteMovie} from '../services/movieService'
+import {getGenres} from '../services/genreService'
+import _ from 'lodash'
+import {toast} from 'react-toastify'
 import ListGroup from './common/listGroup';
 import Pagination from './common/pagination';
 import {Paginate} from './util/paginate'
@@ -18,14 +19,26 @@ export default class movies extends Component {
       sortColumn: { path: 'title', order: 'asc' },
         searchQueryValue:''
     };
-    componentDidMount(){
-         const genres=[{_id:"",name:"All Genre"},...getGenres()]
-        this.setState({movies:getMovies(),
+  async componentDidMount() {
+      const {data} =await getGenres()
+    const genres = [{ _id: "", name: "All Genre" }, ...data]
+    const {data:movies}=await getMovies()
+        this.setState({movies,
             genres})
     }
-    handelDelete= movie=>{
+  handelDelete = async movie => {
+      const originalMovies=this.state.movies
         const movies=this.state.movies.filter(m => m._id!==movie._id)
-        this.setState({movies})
+    this.setState({ movies })
+    try {
+      await deleteMovie(movie._id)
+    }
+    catch (ex) {
+      if (ex.response && ex.response.status === 404) {
+        toast.error('This movie has already deleted')
+        this.setState({movies:originalMovies})
+      }
+    }
     }
     handelLiked=movie=>{
             const movies=[...this.state.movies]
@@ -51,7 +64,7 @@ export default class movies extends Component {
     this.setState({ currentPage: 1, selectedGenre:null,searchQueryValue:query });
   }  
     getPageData=()=>{
-      const { movies: allMovies, pageSize, currentPage, selectedGenre, sortColumn } = this.state
+      const { movies: allMovies, pageSize, currentPage, selectedGenre, sortColumn,searchQueryValue } = this.state
       let filtered = allMovies
       if (searchQueryValue)
         filtered = allMovies.filter(m => m.title.toLowerCase().startsWith(searchQueryValue.toLowerCase()));
@@ -89,9 +102,9 @@ export default class movies extends Component {
                 New Movie
               </Link>
               <p>Showing {totalCount} movies in the database.</p>
-              <SearchBox value={searchQueryValue} onChange={this.searchQuery} />
+              <SearchBox value={this.state.searchQueryValue} onChange={this.searchQuery} />
               <MoviesTable
-                movies={data}
+                movies={data}  
                 sortColumn={sortColumn}
                 onDelete={this.handelDelete}
                 onLike={this.handelLiked}
