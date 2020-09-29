@@ -10,6 +10,7 @@ import MoviesTable from './common/moviesTable';
 import { Link } from 'react-router-dom';
 import SearchBox from './common/searchBox';
 export default class movies extends Component {
+ 
     state={
         movies:[],
         pageSize:4,
@@ -77,7 +78,8 @@ export default class movies extends Component {
         const movies=Paginate(sorted,currentPage,pageSize)
         return {totalCount:filtered.length,data:movies}
     }
-    render() {
+  render() {
+       const { user } = this.props;
         const {length:count}=this.state.movies;
         const {pageSize,currentPage,sortColumn}=this.state
 
@@ -94,13 +96,13 @@ export default class movies extends Component {
               />
             </div>
             <div className="col">
-              <Link
+             {user && <Link
                 to="movies/new"
                 style={{ marginBottom: 20 }}
                 className="btn btn-primary"
               >
                 New Movie
-              </Link>
+              </Link>}
               <p>Showing {totalCount} movies in the database.</p>
               <SearchBox value={this.state.searchQueryValue} onChange={this.searchQuery} />
               <MoviesTable
